@@ -7,21 +7,23 @@ namespace Implem.Pleasanter.NetCore.ExtendedLibrary;
 
 public static class ExtendedLibrary
 {
-    public static void ConfigureServices(IServiceCollection services)
+    public static void ConfigureServices(object services)
     {
         IConfigurationRoot config = LoadConfiguration();
         var settings = config.Get<WebhookSettings>()
             ?? throw new InvalidOperationException("WebhookSettings could not be loaded from configuration.");
 
-        services
-            .AddHttpClient<ILineBotApp, LineBotApp>(httpClient =>
+        RkSoftware.RKPlugin.DependencyInjection.PluginHttpClientFactoryServiceCollection.AddHttpClient<ILineBotApp, LineBotApp>(
+            services,
+            httpClient =>
             {
                 var client = LineMessagingClient.Create(httpClient, settings.LineChannelAccessToken);
                 return new LineBotApp(client, settings.LineChannelSecret);
             });
 
-        services
-            .AddScoped(provider => KernelManager.CreateKernel(settings));
+        RkSoftware.RKPlugin.DependencyInjection.PluginServiceCollectionService.AddScoped(
+            services,
+            provider => KernelManager.CreateKernel(settings));
     }
 
     private static IConfigurationRoot LoadConfiguration()
