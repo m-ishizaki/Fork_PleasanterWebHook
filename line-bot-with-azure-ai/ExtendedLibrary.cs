@@ -2,6 +2,7 @@
 using PleasanterWebHook;
 using PleasanterWebHook.Controller;
 using PleasanterWebHook.Model;
+using System.Diagnostics;
 
 namespace Implem.Pleasanter.NetCore.ExtendedLibrary;
 
@@ -13,7 +14,7 @@ public static class ExtendedLibrary
         var settings = config.Get<WebhookSettings>()
             ?? throw new InvalidOperationException("WebhookSettings could not be loaded from configuration.");
 
-        RkSoftware.RKPlugin.DependencyInjection.PluginHttpClientFactoryServiceCollection.AddHttpClient<ILineBotApp, LineBotApp>(
+        RkSoftware.RKPlugin.DependencyInjection.PluginServiceCollection.AddHttpClient<ILineBotApp, LineBotApp>(
             services,
             httpClient =>
             {
@@ -21,7 +22,7 @@ public static class ExtendedLibrary
                 return new LineBotApp(client, settings.LineChannelSecret);
             });
 
-        RkSoftware.RKPlugin.DependencyInjection.PluginServiceCollectionService.AddScoped(
+        RkSoftware.RKPlugin.DependencyInjection.PluginServiceCollection.AddScoped(
             services,
             provider => KernelManager.CreateKernel(settings));
     }
